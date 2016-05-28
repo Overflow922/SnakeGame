@@ -1,25 +1,24 @@
 package ru.snakegame.ui;
 
 /**
- * Created by Юрий on 14.05.2016.
+ * Author: Юрий
+ * Created: 14.05.2016
+ * Description:
  */
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.snakegame.core.*;
 import ru.snakegame.core.math.Vector2;
-import ru.snakegame.core.math.VectorCalculation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,18 +62,10 @@ public class Window extends Application {
         FieldArray map = new FieldArray(new Vector2<>(this.cellNums, this.cellNums));
 
         theScene.setOnKeyPressed(
-                new EventHandler<KeyEvent>() {
-                    public void handle(KeyEvent e) {
-                        InputSystem.getInstance().put(e);
-                    }
-                });
+                e -> { InputSystem.getInstance().put(e); });
 
         theScene.setOnKeyReleased(
-                new EventHandler<KeyEvent>() {
-                    public void handle(KeyEvent e) {
-                        InputSystem.getInstance().remove(e);
-                    }
-                });
+                e -> { InputSystem.getInstance().remove(e); });
 
         final long startNanoTime = System.nanoTime();
         TimerSystem.getInstance().start();
@@ -93,7 +84,7 @@ public class Window extends Application {
                 {
                     snake.move();
                     CollisionResult result =  CollisionSystem.getInstance().isCollision(map,snake.getHead());
-
+                    System.out.println(result);
                     switch (result) {
                         case SNAKE_COLLISION:
                             this.stop();

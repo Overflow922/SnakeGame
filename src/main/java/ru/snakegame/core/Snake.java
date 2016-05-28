@@ -2,20 +2,22 @@ package ru.snakegame.core;
 
 import ru.snakegame.core.math.Vector2;
 import ru.snakegame.core.math.VectorCalculation;
-import ru.snakegame.ui.WinConsts;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
- * Created by Юрий on 26.05.2016.
+ * Author: Юрий
+ * Created: 25.05.2016
+ * Description:
  */
+
 public class Snake {
 
     private int len = SnakeParams.START_LEN;
     private LinkedList<Vector2<Integer>> cells;
+    private boolean isGrow = false;
     private Vector2<Integer> moveDirection = SnakeParams.START_DIRECTION;
+    private Vector2<Integer> changeDirection = SnakeParams.START_DIRECTION;
 
     public Snake() {
         cells = new LinkedList<>();
@@ -23,11 +25,9 @@ public class Snake {
     }
 
     public void grow() {
-        //TODO: сделать задержку увеличения хвоста 1 ход
         len++;
         assert (cells.size() >2) : "too small len";
-        Vector2<Integer> grad = VectorCalculation.sub(cells.getLast(), cells.get(cells.size()-2));
-        cells.add(VectorCalculation.add(cells.getLast(), grad));
+        this.isGrow = true;
     }
 
     private void createSnake() {
@@ -55,14 +55,11 @@ public class Snake {
         this.moveDirection = new_dir;
     }
 
-    public Vector2<Integer> getMoveDirection() {
-        return this.moveDirection;
-    }
-
     public void updateMoveDirection() {
         // TODO: кнопки управления задавать где то во внешнем файле (не здесь)
-        // TODO: сделать изменения направления по таймеру
-        Vector2<Integer> newDir = this.moveDirection;
+
+
+        Vector2<Integer> newDir = this.changeDirection;
 
         if (InputSystem.getInstance().contains("LEFT")) { newDir = SnakeParams.Directions.MOVE_LEFT; }
         if (InputSystem.getInstance().contains("RIGHT")) { newDir = SnakeParams.Directions.MOVE_RIGHT; }
@@ -71,20 +68,46 @@ public class Snake {
 
         Vector2<Integer> t = VectorCalculation.add(newDir, this.moveDirection);
         if (!(t.getX() == 0 && t.getY() == 0))
-            this.moveDirection = newDir;
+            this.changeDirection = newDir;
     }
 
-    public void move() {
-        Vector2<Integer> newHeadPos = VectorCalculation.add(cells.getFirst(), moveDirection);
+    private void changeMoveDirection() {
+        Vector2<Integer> t = VectorCalculation.add(this.changeDirection, this.moveDirection);
+        if (!(t.getX() == 0 && t.getY() == 0))
+            this.moveDirection = this.changeDirection;
+    }
 
-        if (CollisionSystem.getInstance().isBorderCollision(newHeadPos) != CollisionResult.BORDER_COLLISION) {
-            cells.addFirst(newHeadPos);
-            cells.removeLast();
+    // если змея растет, она не двигается, вырастает голова
+    // если не растет, движется на одну клетку по направлению moveDirection
+    public void move() {
+        // TODO: поменять на getNextHead
+        this.changeMoveDirection();
+        if (this.isGrow) {
+            cells.addFirst(this.getNextHead());
+            this.isGrow = false;
+        }
+        else {
+            Vector2<Integer> newHead = this.getNextHead();
+            if (CollisionSystem.getInstance().isBorderCollision(newHead) != CollisionResult.BORDER_COLLISION &&
+                    CollisionSystem.getInstance().isSnakeCollision(this) != CollisionResult.SNAKE_COLLISION) {
+                cells.addFirst(newHead);
+                cells.removeLast();
+            }
         }
     }
 
     public Vector2<Integer> getHead() {
         return cells.getFirst();
+    }
+
+    public Vector2<Integer> getNextHead() { return VectorCalculation.add(this.getHead(), this.moveDirection);}
+
+    public boolean isBelong(final Vector2<Integer> coords) {
+        for (Vector2<Integer> i: cells) {
+            if (VectorCalculation.compare(coords, i))
+                return true;
+        }
+        return false;
     }
 
     @Override

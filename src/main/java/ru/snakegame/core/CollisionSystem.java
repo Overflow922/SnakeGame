@@ -1,10 +1,11 @@
 package ru.snakegame.core;
 
 import ru.snakegame.core.math.Vector2;
-import ru.snakegame.ui.WinConsts;
 
 /**
- * Created by Юрий on 26.05.2016.
+ * Author: Юрий
+ * Created: 26.05.2016
+ * Description:
  */
 public class CollisionSystem {
     private static CollisionSystem ourInstance = new CollisionSystem();
@@ -36,13 +37,21 @@ public class CollisionSystem {
         return CollisionResult.NO_COLLISION;
     }
 
+    public CollisionResult isSnakeCollision(final Snake snake) {
+        if (snake.isBelong(snake.getNextHead())) {
+            this.setIsCollision(CollisionResult.SNAKE_COLLISION);
+            return CollisionResult.SNAKE_COLLISION;
+        }
+        return CollisionResult.NO_COLLISION;
+    }
+
     public CollisionResult isCollision(final FieldArray map, final Vector2<Integer> snakeHead) {
-        if (isCollision != CollisionResult.NO_COLLISION)
+        if (isCollision != CollisionResult.NO_COLLISION) {
             return this.isCollision;
+        }
 
         if (this.isBorderCollision(snakeHead) != CollisionResult.BORDER_COLLISION) {
             CellState cell = map.getCell(snakeHead).getState();
-            System.out.println(snakeHead);
             switch (cell) {
                 case CELL_APPLE:
                     return CollisionResult.APPLE_COLLISION;

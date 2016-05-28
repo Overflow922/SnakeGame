@@ -1,11 +1,14 @@
 package ru.snakegame.core;
 
 /**
- * Created by Юрий on 14.05.2016.
+ * Author: Юрий
+ * Created: 15.05.2016
+ * Description:
  */
 public enum CellState {
     CELL_EMPTY,
     CELL_APPLE,
     CELL_SNAKE,
-    CELL_SNAKE_HEAD
+    CELL_SNAKE_HEAD,
+    CELL_SNAKE_TAIL
 }
